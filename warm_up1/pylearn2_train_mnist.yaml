@@ -1,0 +1,34 @@
+# Sorry for not including the original pylearn2 files here.
+
+# https://github.com/lisa-lab/pylearn2/blob/master/pylearn2/scripts/train.py
+
+!obj:pylearn2.train.Train {
+    dataset: !pkl: "pylearn2_mnist_train.pkl",
+
+    model: !obj:pylearn2.models.softmax_regression.SoftmaxRegression {
+        batch_size: 5,
+        n_classes: 10,
+        nvis: 784,
+        irange: 0.01
+    },
+    algorithm: !obj:pylearn2.training_algorithms.sgd.SGD { 
+        learning_rate: 0.05,
+        monitoring_dataset:
+        {
+            'train': !pkl: "pylearn2_mnist_train.pkl",
+            'valid': !pkl: "pylearn2_mnist_cv.pkl",
+            'test' : !pkl: "pylearn2_mnist_test.pkl"
+        },
+        termination_criterion: !obj:pylearn2.termination_criteria.MonitorBased {
+            channel_name: "valid_y_misclass"
+        }
+    },
+    extensions: [
+        !obj:pylearn2.train_extensions.best_params.MonitorBasedSaveBest {
+             channel_name: 'valid_y_misclass',
+             save_path: "pylearn2_mnist_softmax_regression_best.pkl"
+        },
+    ],
+}
+
+
